@@ -1,9 +1,23 @@
-import React from "react";
+import {
+    ProjectsContext,
+    ProjectsProvider,
+    useProjectsValue,
+} from './projects-context';
 
-// set the defaults
-const LogInContext = React.createContext({
-    isLoggedIn: false,
-    setIsLoggedIn: () => {}
-});
+import {
+    SelectedProjectContext,
+    SelectedProjectProvider,
+    useSelectedProjectValue,
+} from './selected-project-context';
 
-export default LogInContext;
+import { LogInContext } from './login-context';
+
+export {
+    ProjectsContext,
+    ProjectsProvider,
+    useProjectsValue,
+    SelectedProjectContext,
+    SelectedProjectProvider,
+    useSelectedProjectValue,
+    LogInContext,
+};
