@@ -22,10 +22,18 @@ const DismissKeyboard = ({ children }) => (
     </TouchableWithoutFeedback>
 );
 
-export default function NewTask({ modalVisible, setModalVisible }) {
-    const [task, setTask] = useState('');
-    const [description, setDescription] = useState('');
-    const [date, setDate] = useState(new Date());
+export default function EditTask({
+    modalVisible,
+    setModalVisible,
+    hotTask,
+    setHotTask,
+    showActiveTask,
+    setShowActiveTask,
+    onRefresh,
+}) {
+    const [task, setTask] = useState(hotTask.task);
+    const [description, setDescription] = useState(hotTask.description);
+    const [date, setDate] = useState(hotTask.date);
     const [showDate, setShowDate] = useState(false);
     const [noDate, setNoDate] = useState(false);
 
@@ -42,38 +50,24 @@ export default function NewTask({ modalVisible, setModalVisible }) {
         setModalVisible(!modalVisible);
     };
 
-    const addTask = () => {
-        const projectId = 'INBOX';
-        let collatedDate = '';
-        let createdTime = moment().format('YYYY/MM/DD HH:mm:ss');
-
-        if (projectId === 'TODAY') {
-            collatedDate = moment().format('YYYY/MM/DD');
-        } else if (projectId === 'NEXT_7') {
-            collatedDate = moment().add(7, 'days').format('YYYY/MM/DD');
-        }
-
-        return (
-            projectId &&
-            task !== '' &&
-            firebase
-                .firestore()
-                .collection('tasks')
-                .add({
-                    archived: false,
-                    projectId, // projectId: projectId
-                    task, // task: task
-                    date: noDate ? '' : moment(date).format('YYYY/MM/DD'),
-                    createdTime,
-                    userId: 'o5xLFrfzgrbTnfK7Iq9Ut3dTX9S2',
-                    description,
-                })
-                .then(() => {
-                    setTask('');
-                    setDescription('');
-                    setModalVisible(false);
-                })
-        );
+    const updateTask = () => {
+        firebase
+            .firestore()
+            .collection('tasks')
+            .doc(hotTask.id)
+            .update({
+                task,
+                description,
+                date: moment(date).format('YYYY/MM/DD'),
+            })
+            .then(() => {
+                setHotTask({...hotTask, description, task, date});
+                setTask('');
+                setDescription('');
+                setModalVisible(false);
+                onRefresh();
+                setShowActiveTask(true);
+            });
     };
 
     const onDateChange = (event, selectedDate) => {
@@ -81,7 +75,13 @@ export default function NewTask({ modalVisible, setModalVisible }) {
         const currentDate = selectedDate || date;
         setDate(currentDate);
     };
-    
+
+    useEffect(() => {
+        setTask(hotTask.task);
+        setDescription(hotTask.description);
+        setDate(moment(hotTask.date, 'YYYY/MM/DD'));
+    }, [modalVisible]);
+
     return (
         <Modal
             animationType="slide"
@@ -94,7 +94,7 @@ export default function NewTask({ modalVisible, setModalVisible }) {
             <DismissKeyboard>
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        <Text style={styles.modalHeading}>New Task</Text>
+                        <Text style={styles.modalHeading}>Edit Task</Text>
                         {!showDate && (
                             <>
                                 <View style={styles.row}>
@@ -127,12 +127,17 @@ export default function NewTask({ modalVisible, setModalVisible }) {
                                 <View style={styles.dateView}>
                                     <DateTimePicker
                                         mode="date"
-                                        value={date}
+                                        value={`${moment(
+                                            date,
+                                            'YYYY/MM/DD'
+                                        ).format('YYYY-MM-DD')}T00:00:00.000Z`}
                                         onChange={onDateChange}
                                         display="calendar"
                                     />
                                     <Text style={styles.dateText}>
-                                        {moment(date).format('DD.MM.YYYY')}
+                                        {moment(date, 'YYYY/MM/DD').format(
+                                            'DD.MM.YYYY'
+                                        )}
                                     </Text>
 
                                     <Pressable
@@ -188,9 +193,9 @@ export default function NewTask({ modalVisible, setModalVisible }) {
                     <View style={styles.bottomView}>
                         <Pressable
                             style={[styles.button, styles.buttonComplete]}
-                            onPress={addTask}
+                            onPress={updateTask}
                         >
-                            <Text style={styles.textStyle}>Create</Text>
+                            <Text style={styles.textStyle}>Save</Text>
                         </Pressable>
                         <Pressable
                             style={[styles.button, styles.buttonClose]}
@@ -317,6 +322,7 @@ const styles = StyleSheet.create({
     },
     descriptionInput: {
         minHeight: 60,
+        maxHeight: 150,
         width: '100%',
         marginVertical: 12,
         padding: 5,

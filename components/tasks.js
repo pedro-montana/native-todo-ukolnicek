@@ -6,6 +6,7 @@ import { collatedTasks } from '../constants';
 import { getTitle, getCollatedTitle, collatedTasksExist } from '../helpers';
 import { useSelectedProjectValue, useProjectsValue } from '../context';
 import One from './one';
+import EditTask from './editTask';
 import { firebase } from '../firebase';
 import moment from 'moment';
 
@@ -14,6 +15,7 @@ const wait = (timeout) => {
 };
 
 const Tasks = ({ activeTasks }) => {
+    const [editMode, setEditMode] = useState(false);
     const { selectedProject } = useSelectedProjectValue();
     const { projects } = useProjectsValue();
     const { tasks, archivedTasks } = useTasks(selectedProject);
@@ -59,12 +61,13 @@ const Tasks = ({ activeTasks }) => {
         id: 0,
         task: '',
         description: '',
+        date: '',
     });
 
     const tasksUnderlayColor = '#8c80ff';
 
     if (!activeTasks)
-    // completed tasks
+        // completed tasks
         return (
             <View style={styles.list}>
                 {/* <Text style={styles.heading}>Archive</Text> */}
@@ -83,7 +86,10 @@ const Tasks = ({ activeTasks }) => {
                                     onPress={() => {
                                         setModalVisible(true), setHotTask(item);
                                     }}
-                                    style={[styles.oneTask, { backgroundColor: '#d3d1e0' }]}
+                                    style={[
+                                        styles.oneTask,
+                                        { backgroundColor: '#d3d1e0' },
+                                    ]}
                                     underlayColor={tasksUnderlayColor}
                                 >
                                     <View>
@@ -112,7 +118,6 @@ const Tasks = ({ activeTasks }) => {
     // active tasks
     return (
         <View style={styles.list}>
-            {/* <Text style={styles.heading}>{selectedProject}</Text> */}
             {tasks.length > 0 ? (
                 <FlatList
                     data={tasks}
@@ -149,6 +154,18 @@ const Tasks = ({ activeTasks }) => {
                 hotTask={hotTask}
                 archiveTask={archiveTask}
                 activeTasks={activeTasks}
+                editMode={editMode}
+                setEditMode={setEditMode}
+            />
+            <EditTask
+                modalVisible={editMode}
+                setModalVisible={setEditMode}
+                showActiveTask={modalVisible}
+                setShowActiveTask={setModalVisible}
+                hotTask={hotTask}
+                setHotTask={setHotTask}
+                activeTasks={activeTasks}
+                onRefresh={onRefresh}
             />
         </View>
     );

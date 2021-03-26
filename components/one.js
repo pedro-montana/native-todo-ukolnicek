@@ -1,3 +1,4 @@
+import moment from 'moment';
 import React from 'react';
 import {
     View,
@@ -6,7 +7,9 @@ import {
     Pressable,
     Modal,
     ScrollView,
+    Alert,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons'; 
 
 export default function One({
     modalVisible,
@@ -15,6 +18,8 @@ export default function One({
     archiveTask,
     activeTasks,
     reviveTask,
+    editMode,
+    setEditMode,
 }) {
     return (
         <Modal
@@ -28,7 +33,16 @@ export default function One({
             <View style={styles.centeredView}>
                 <View style={styles.modalView}>
                     <ScrollView styles={styles.taskContent}>
-                        <Text style={styles.modalHeading}>{hotTask.task}</Text>
+                        <Pressable onPress={() => {setModalVisible(false),setEditMode(true)}}>
+                        <Text style={styles.modalHeading}>{hotTask.task}{activeTasks && ' *'}</Text>
+                        </Pressable>
+                        {hotTask.date !== '' && (
+                            <Text style={[styles.modalDescription, styles.modalDate]}>
+                                Date: {moment(hotTask.date, 'YYYY/MM/DD').format(
+                                    'DD.MM.YYYY'
+                                )}
+                            </Text>
+                        )}
                         <Text style={styles.modalDescription}>
                             {hotTask.description.length > 0
                                 ? hotTask.description
@@ -45,7 +59,8 @@ export default function One({
                                 archiveTask(), setModalVisible(false);
                             }}
                         >
-                            <Text style={styles.textStyle}>Completed!</Text>
+                            {/* <Text style={styles.textStyle}>Completed!</Text> */}
+                            <MaterialIcons style={styles.completedIcon} name="done-outline" size={24} color="white" />
                         </Pressable>
                         <Pressable
                             style={[styles.button, styles.buttonClose]}
@@ -58,7 +73,11 @@ export default function One({
                     // completed tasks
                     <View style={styles.bottomView}>
                         <Pressable
-                            style={[styles.button, styles.buttonComplete, { backgroundColor: '#166916' }]}
+                            style={[
+                                styles.button,
+                                styles.buttonComplete,
+                                { backgroundColor: '#166916' },
+                            ]}
                             onPress={() => {
                                 reviveTask(), setModalVisible(false);
                             }}
@@ -132,10 +151,16 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 18,
     },
+    completedIcon: {
+        alignSelf: 'center',
+    },
     modalHeading: {
         marginBottom: 15,
         textAlign: 'center',
         fontSize: 22,
+    },
+    modalDate: {
+        color: '#000099',
     },
     modalDescription: {
         marginBottom: 15,
