@@ -1,8 +1,15 @@
-import React, { useContext, useState } from 'react';
-import { StyleSheet, View, TouchableHighlight, Text, Linking } from 'react-native';
-import { LogInContext } from '../context';
+import React, { useState } from 'react';
+import {
+    StyleSheet,
+    View,
+    TouchableHighlight,
+    Text,
+    Linking,
+    Alert,
+} from 'react-native';
 import globalStyles from '../global.style';
 import NewTask from '../components/newTask';
+import { firebase } from '../firebase';
 
 export default function Home({ navigation }) {
     const [newTask, setNewTask] = useState(false);
@@ -14,11 +21,19 @@ export default function Home({ navigation }) {
         navigation.navigate('CompletedTasks');
     };
 
-    const { setIsLoggedIn } = useContext(LogInContext);
-
     const openURL = (url) => {
-        Linking.openURL(url).catch((err) => console.error('An error occurred', err));
-      }
+        Linking.openURL(url).catch((err) =>
+            console.error('An error occurred', err)
+        );
+    };
+
+    async function logOut() {
+        try {
+            await firebase.auth().signOut();
+        } catch (error) {
+            Alert.alert(error.message);
+        }
+    }
 
     return (
         <View
@@ -51,18 +66,24 @@ export default function Home({ navigation }) {
                 </TouchableHighlight>
                 <TouchableHighlight
                     style={styles.button}
-                    onPress={() => setIsLoggedIn(false)}
+                    onPress={() => logOut()}
                     underlayColor="grey"
                 >
                     <Text style={styles.buttonText}>Log Out</Text>
                 </TouchableHighlight>
                 <TouchableHighlight
-                        style={[styles.gitHubButton]}
-                        onPress={() => openURL('https://github.com/pedro-montana/native-todo-ukolnicek')}
-                        underlayColor="grey"
-                    >
-                        <Text style={styles.buttonText}>Project GitHub {'</>'}</Text>
-                    </TouchableHighlight>
+                    style={[styles.gitHubButton]}
+                    onPress={() =>
+                        openURL(
+                            'https://github.com/pedro-montana/native-todo-ukolnicek'
+                        )
+                    }
+                    underlayColor="grey"
+                >
+                    <Text style={styles.buttonText}>
+                        Project GitHub {'</>'}
+                    </Text>
+                </TouchableHighlight>
             </View>
             <NewTask modalVisible={newTask} setModalVisible={setNewTask} />
         </View>

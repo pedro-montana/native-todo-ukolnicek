@@ -6,21 +6,13 @@ import {
     Pressable,
     Modal,
     TextInput,
-    TouchableWithoutFeedback,
-    Keyboard,
-    Platform,
     Button,
 } from 'react-native';
+import DismissKeyboard from '../utils/dismissKeyboard';
 import { firebase } from '../firebase';
 import moment from 'moment';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { AntDesign } from '@expo/vector-icons';
-
-const DismissKeyboard = ({ children }) => (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        {children}
-    </TouchableWithoutFeedback>
-);
 
 export default function NewTask({ modalVisible, setModalVisible }) {
     const [task, setTask] = useState('');

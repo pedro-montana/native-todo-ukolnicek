@@ -1,25 +1,29 @@
 import 'react-native-gesture-handler';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Home from './screens/Home';
 import LogIn from './screens/LogIn';
 import SignUp from './screens/SignUp';
-import { LogInContext } from './context';
+import { AuthProvider } from './context';
 import TasksScreen from './screens/TasksScreen';
 import CompletedTasks from './screens/CompletedTasks';
+import { firebase } from './firebase';
 
 const { Navigator, Screen } = createStackNavigator();
 
 export default function App() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const value = { isLoggedIn, setIsLoggedIn };
+    const [currentUser, setCurrentUser] = useState(null);
+
+    useEffect(() => {
+        firebase.auth().onAuthStateChanged(setCurrentUser);
+      }, []);
 
     return (
-        <LogInContext.Provider value={value}>
+        <AuthProvider>
             <NavigationContainer>
                 <Navigator>
-                    {isLoggedIn ? (
+                    {currentUser ? (
                         <>
                             <Screen
                                 name="Home"
@@ -53,6 +57,6 @@ export default function App() {
                     )}
                 </Navigator>
             </NavigationContainer>
-        </LogInContext.Provider>
+        </AuthProvider>
     );
 }

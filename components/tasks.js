@@ -70,7 +70,6 @@ const Tasks = ({ activeTasks }) => {
         // completed tasks
         return (
             <View style={styles.list}>
-                {/* <Text style={styles.heading}>Archive</Text> */}
                 {archivedTasks.length > 0 ? (
                     <FlatList
                         data={archivedTasks}
