@@ -1,6 +1,6 @@
 # native-todo-ukolnicek
 React Native todo app
-last build (.apk) https://expo.io/artifacts/00d0cdd3-0a52-4d80-b67d-790319f2a813
+last build (.apk) https://expo.io/artifacts/5bae805f-a38d-49f8-8738-333f23c21352
 
 open in Expo:
-![alt text](https://user-images.githubusercontent.com/63665548/112288880-145fcf00-8c8e-11eb-8c08-99fd30b169b5.png)
+![alt text](https://user-images.githubusercontent.com/63665548/112721489-53975580-8f04-11eb-8130-d19ff4d3ed65.png)
